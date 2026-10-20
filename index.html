@@ -1,163 +1,221 @@
 
 async function openAccountModal() {
-  const { data: { session } } =
-    await payworldSupabase.auth.getSession();
+  try {
+    const { data: { session }, error } =
+      await payworldSupabase.auth.getSession();
 
-  if (session) {
-    const email = session.user.email || "Signed-in user";
+    if (error) throw error;
 
-    showModal(
-      "Your Payworld account",
-      `<p>Signed in as <strong>${escapeHtml(email)}</strong></p>
-       <p class="small muted">Your email account is authenticated by Supabase.</p>`,
-      "Log out",
-      async () => {
-        const { error } = await payworldSupabase.auth.signOut();
+    if (session) {
+      const email = session.user.email || "Signed-in user";
 
-        if (error) {
-          toast("Logout failed. Please try again.");
-          return;
+      showModal(
+        "Your Payworld account",
+        `<p>Signed in as <strong>${escapeHtml(email)}</strong></p>
+         <p class="small muted">
+           Your account is authenticated by Supabase.
+         </p>`,
+        "Log out",
+        async () => {
+          const { error: logoutError } =
+            await payworldSupabase.auth.signOut();
+
+          if (logoutError) {
+            toast("Logout failed. Please try again.");
+            return;
+          }
+
+          toast("You have logged out.");
+          await updatePayworldAccount();
         }
+      );
 
-        toast("You have logged out.");
-        updatePayworldAccount();
-      }
-    );
-    return;
-  }
-
-  const root = $("modalRoot");
-  root.innerHTML = `
-    <div class="modal-backdrop">
-      <div class="modal">
-        <h2 id="authTitle">Sign in to Payworld</h2>
-        <p class="small muted">
-          Use your email to sign in or create an account.
-        </p>
-
-        <form id="payworldAuthForm">
-          <label for="authEmail">Email address</label>
-          <input id="authEmail" class="field"
-            type="email" autocomplete="email" required>
-
-          <label for="authPassword" style="margin-top:14px">
-            Password
-          </label>
-          <input id="authPassword" class="field"
-            type="password" minlength="8"
-            autocomplete="current-password" required>
-
-          <p id="authMessage" class="small muted"
-            aria-live="polite"></p>
-
-          <button class="btn full" type="submit" id="authSubmit">
-            Sign in
-          </button>
-        </form>
-
-        <button class="btn secondary full" id="authToggle"
-          style="margin-top:12px">
-          Need an account? Sign up
-        </button>
-
-        <button class="btn secondary full" id="authCancel"
-          style="margin-top:8px">
-          Cancel
-        </button>
-      </div>
-    </div>`;
-
-  let mode = "login";
-
-  $("authCancel").onclick = () => {
-    root.innerHTML = "";
-  };
-
-  $("authToggle").onclick = () => {
-    mode = mode === "login" ? "signup" : "login";
-    $("authTitle").textContent =
-      mode === "login" ? "Sign in to Payworld" : "Create your account";
-    $("authSubmit").textContent =
-      mode === "login" ? "Sign in" : "Create account";
-    $("authToggle").textContent =
-      mode === "login"
-        ? "Need an account? Sign up"
-        : "Already registered? Sign in";
-    $("authPassword").autocomplete =
-      mode === "login" ? "current-password" : "new-password";
-    $("authMessage").textContent = "";
-  };
-
-  $("payworldAuthForm").onsubmit = async (event) => {
-    event.preventDefault();
-
-    const email = $("authEmail").value.trim();
-    const password = $("authPassword").value;
-    const submit = $("authSubmit");
-    const message = $("authMessage");
-
-    submit.disabled = true;
-    message.textContent = "Please wait…";
-
-    try {
-      if (mode === "signup") {
-        const { data, error } =
-          await payworldSupabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: location.origin + location.pathname
-            }
-          });
-
-        if (error) throw error;
-
-        if (data.session) {
-          root.innerHTML = "";
-          toast("Your Payworld account has been created.");
-          updatePayworldAccount();
-        } else {
-          message.textContent =
-            "Registration submitted. Check your email to confirm your account.";
-          submit.disabled = false;
-        }
-      } else {
-        const { error } =
-          await payworldSupabase.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (error) throw error;
-
-        root.innerHTML = "";
-        toast("Welcome back to Payworld!");
-        updatePayworldAccount();
-      }
-    } catch (error) {
-      message.textContent = error.message || "Authentication failed.";
-      submit.disabled = false;
+      return;
     }
-  };
+
+    const root = $("modalRoot");
+
+    root.innerHTML = `
+      <div class="modal-backdrop">
+        <div class="modal">
+          <h2 id="authTitle">Sign in to Payworld</h2>
+
+          <p class="small muted">
+            Sign in or create your Payworld account.
+          </p>
+
+          <form id="payworldAuthForm">
+            <label for="authEmail">Email address</label>
+            <input
+              id="authEmail"
+              class="field"
+              type="email"
+              autocomplete="email"
+              required
+            >
+
+            <label for="authPassword" style="margin-top:14px">
+              Password
+            </label>
+            <input
+              id="authPassword"
+              class="field"
+              type="password"
+              minlength="8"
+              autocomplete="current-password"
+              required
+            >
+
+            <p
+              id="authMessage"
+              class="small muted"
+              aria-live="polite"
+            ></p>
+
+            <button
+              class="btn full"
+              type="submit"
+              id="authSubmit"
+            >Sign in</button>
+          </form>
+
+          <button
+            class="btn secondary full"
+            type="button"
+            id="authToggle"
+            style="margin-top:12px"
+          >Need an account? Sign up</button>
+
+          <button
+            class="btn secondary full"
+            type="button"
+            id="authCancel"
+            style="margin-top:8px"
+          >Cancel</button>
+        </div>
+      </div>
+    `;
+
+    let mode = "login";
+
+    $("authCancel").onclick = () => {
+      root.innerHTML = "";
+    };
+
+    $("authToggle").onclick = () => {
+      mode = mode === "login" ? "signup" : "login";
+
+      $("authTitle").textContent =
+        mode === "login"
+          ? "Sign in to Payworld"
+          : "Create your account";
+
+      $("authSubmit").textContent =
+        mode === "login" ? "Sign in" : "Create account";
+
+      $("authToggle").textContent =
+        mode === "login"
+          ? "Need an account? Sign up"
+          : "Already registered? Sign in";
+
+      $("authPassword").autocomplete =
+        mode === "login"
+          ? "current-password"
+          : "new-password";
+
+      $("authMessage").textContent = "";
+    };
+
+    $("payworldAuthForm").onsubmit = async (event) => {
+      event.preventDefault();
+
+      const email = $("authEmail").value.trim();
+      const password = $("authPassword").value;
+      const submit = $("authSubmit");
+      const message = $("authMessage");
+
+      submit.disabled = true;
+      message.textContent = "Please wait…";
+
+      try {
+        if (mode === "signup") {
+          const { data, error: signupError } =
+            await payworldSupabase.auth.signUp({
+              email,
+              password,
+              options: {
+                emailRedirectTo: window.location.href
+              }
+            });
+
+          if (signupError) throw signupError;
+
+          if (data.session) {
+            root.innerHTML = "";
+            toast("Your Payworld account has been created.");
+            await updatePayworldAccount();
+          } else {
+            message.textContent =
+              "Registration submitted. Check your email to confirm your account.";
+            submit.disabled = false;
+          }
+        } else {
+          const { error: loginError } =
+            await payworldSupabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+          if (loginError) throw loginError;
+
+          root.innerHTML = "";
+          toast("Welcome back to Payworld!");
+          await updatePayworldAccount();
+        }
+      } catch (error) {
+        message.textContent =
+          error.message || "Authentication failed. Please try again.";
+
+        submit.disabled = false;
+      }
+    };
+  } catch (error) {
+    toast("Unable to open your account. Check your connection and try again.");
+    console.error("Payworld account error:", error);
+  }
 }
 
-async function updatePayworldAccount() {
-  const { data: { session } } =
-    await payworldSupabase.auth.getSession();
-
+function setPayworldAccount(session) {
   const email = session?.user?.email;
 
   $("accountBtn").textContent = email ? "My account" : "Sign in";
+
   $("accountStatus").textContent = email
     ? "Signed in as " + email
     : "You are browsing as a guest.";
-  $("accountAction").textContent =
-    email ? "Manage account" : "Sign in or create account";
+
+  $("accountAction").textContent = email
+    ? "Manage account"
+    : "Sign in or create account";
+}
+
+async function updatePayworldAccount() {
+  const { data, error } =
+    await payworldSupabase.auth.getSession();
+
+  if (error) {
+    console.error("Could not retrieve account session:", error);
+    return;
+  }
+
+  setPayworldAccount(data.session);
 }
 
 $("accountBtn").addEventListener("click", openAccountModal);
 $("accountAction").addEventListener("click", openAccountModal);
 
-payworldSupabase.auth.onAuthStateChange(() => {
-  updatePayworldAccount();
+payworldSupabase.auth.onAuthStateChange((_event, session) => {
+  setPayworldAccount(session);
 });
+
+updatePayworldAccount();
