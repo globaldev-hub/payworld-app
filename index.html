@@ -1,671 +1,163 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090b18">
-<meta name="description" content="Payworld — digital products, learning, tools and rewards.">
-<title>Payworld | Your Digital World</title>
-<style>
-:root{
-  --bg:#090b18;--panel:#11152a;--panel2:#191e38;
-  --purple:#8b5cf6;--blue:#5268ff;--cyan:#62d9ff;
-  --text:#f6f7ff;--muted:#a3acc8;--border:rgba(255,255,255,.09);
-  --green:#4ade80;--gold:#facc15;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:88px}
-body{margin:0;background:radial-gradient(ellipse at 0 0,#29205b55,transparent 35%),radial-gradient(ellipse at 100% 20%,#163c6650,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-button,input,select{font:inherit}
-button,a{-webkit-tap-highlight-color:transparent}
-button{cursor:pointer}
-a{color:inherit;text-decoration:none}
-.container{width:min(1160px,92%);margin:auto}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.hidden{display:none!important}
-header{position:sticky;top:0;z-index:20;background:#090b18eF;backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
-.topbar{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900}
-.brand-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--blue));box-shadow:0 0 24px #7657f555}
-nav{display:flex;gap:18px;align-items:center}
-nav a{font-size:13px;color:var(--muted)}
-nav a:hover{color:white}
-.btn{border:0;border-radius:12px;padding:12px 17px;color:white;font-weight:750;background:linear-gradient(110deg,var(--purple),var(--blue));box-shadow:0 6px 24px #6e56ed30}
-.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
-.btn.secondary{background:#ffffff0b;border:1px solid var(--border);box-shadow:none}
-.btn.full{width:100%}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.menu-btn{display:none}
-main{padding-bottom:70px}
-.hero{padding:60px 0 30px;display:grid;grid-template-columns:1.2fr .8fr;gap:35px;align-items:center}
-.hero h1{font-size:clamp(38px,6vw,65px);line-height:1.05;letter-spacing:-2px;margin:17px 0}
-.gradient-text{background:linear-gradient(100deg,#c4b5fd,#7dd3fc,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{font-size:16px;line-height:1.8;color:var(--muted);max-width:570px}
-.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:30px;border:1px solid var(--border);background:#ffffff08;font-size:12px;color:#d6d9f1}
-.hero-art{min-height:290px;display:grid;place-items:center;position:relative}
-.orb{width:min(300px,78vw);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#b6a4ff,#7451db 35%,#18264d 68%,#0b1020);box-shadow:0 0 65px #805cf755, inset 0 0 40px #ffffff22}
-.orb-inner{width:72%;height:72%;border-radius:50%;border:1px solid #ffffff35;display:grid;place-items:center;text-align:center;background:#11152a55;backdrop-filter:blur(8px)}
-.orb-symbol{font-size:75px;font-weight:900;text-shadow:0 0 35px #ffffff88}
-.orb-label{font-size:12px;letter-spacing:2px;color:#e1ddff}
-.section{padding:30px 0}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:19px}
-.section-head h2{margin:0;font-size:25px;letter-spacing:-.6px}
-.section-head p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.card{background:linear-gradient(145deg,#171b34ed,#101326f5);border:1px solid var(--border);border-radius:20px;padding:20px;min-width:0;box-shadow:0 10px 30px #00000012}
-.card:hover{border-color:#8b5cf655}
-.card h3{margin:12px 0 7px;font-size:17px}
-.card p{color:var(--muted);font-size:13px;line-height:1.7;margin:6px 0 15px}
-.card-icon{width:47px;height:47px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#8b5cf638,#5268ff30);border:1px solid #ffffff0b}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.wallet{padding:25px;background:linear-gradient(130deg,#3d277b,#4337a2 50%,#176c92);position:relative;overflow:hidden}
-.wallet:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #ffffff22;border-radius:50%;right:-80px;top:-110px;box-shadow:0 0 0 25px #ffffff08,0 0 0 55px #ffffff05}
-.wallet>*{position:relative;z-index:1}
-.wallet .amount{font-size:clamp(31px,5vw,43px);font-weight:850;letter-spacing:-1px;margin:15px 0}
-.wallet-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.wallet-actions .btn{background:#ffffff19;border:1px solid #ffffff38;box-shadow:none}
-.field{width:100%;background:#0b0e1e;color:white;border:1px solid var(--border);border-radius:11px;padding:12px;outline:none}
-.field:focus{border-color:var(--purple)}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
-.product-price{font-size:23px;font-weight:850;margin:10px 0}
-.tag{font-size:11px;padding:5px 8px;border-radius:20px;background:#8b5cf61e;color:#c4b5fd;display:inline-block}
-.status{color:var(--green);font-size:12px}
-.progress{height:7px;border-radius:10px;background:#ffffff12;overflow:hidden;margin:13px 0}
-.progress span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:10px;transition:width .3s}
-.stat-number{font-size:25px;font-weight:850;margin-top:10px}
-.activity{display:flex;flex-direction:column;gap:0}
-.activity-item{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);font-size:13px}
-.activity-item:last-child{border:0}
-.activity-left{display:flex;gap:10px;align-items:center}
-.activity-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:#ffffff0c}
-.chat-box{height:260px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:13px;background:#0b0e1d;border:1px solid var(--border);border-radius:14px;margin:14px 0}
-.bubble{padding:10px 12px;border-radius:13px;max-width:90%;font-size:13px;line-height:1.6;background:#ffffff0b;align-self:flex-start;overflow-wrap:anywhere}
-.bubble.user{align-self:flex-end;background:#5943b5}
-.chat-controls{display:flex;gap:8px}
-.chat-controls input{min-width:0;flex:1}
-.notice{border:1px solid #facc1540;background:#facc150b;border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.7;color:#e8ddb0;margin:15px 0}
-footer{border-top:1px solid var(--border);padding:30px 0;color:var(--muted);font-size:12px}
-footer .row{flex-wrap:wrap}
-.empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}
-.modal-backdrop{position:fixed;inset:0;background:#000b;z-index:50;display:grid;place-items:center;padding:18px}
-.modal{width:min(430px,100%);background:#13172b;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 25px 100px #0009;max-height:90vh;overflow:auto}
-.modal h2{margin-top:0}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:80;background:#202746;border:1px solid #ffffff24;padding:12px 17px;border-radius:12px;box-shadow:0 8px 35px #0008;font-size:13px;max-width:90%;text-align:center}
-.mobile-nav{display:none}
-@media(max-width:820px){
- nav{display:none;position:absolute;top:70px;left:0;right:0;padding:18px 5%;background:#0d1022;border-bottom:1px solid var(--border);flex-direction:column;align-items:flex-start}
- nav.open{display:flex}
- .menu-btn{display:inline-flex}
- .hero{grid-template-columns:1fr;padding-top:38px;gap:10px}
- .hero-art{min-height:230px}
- .orb{width:220px}
- .orb-symbol{font-size:58px}
- .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:520px){
- .grid{grid-template-columns:1fr}
- .topbar{min-height:64px}
- .brand{font-size:18px}
- .hero h1{letter-spacing:-1.5px}
- .section{padding:22px 0}
- .section-head h2{font-size:22px}
- .card{padding:17px}
- .form-row{grid-template-columns:1fr}
- .hide-mobile{display:none}
- .wallet{padding:20px}
- .wallet-actions .btn{flex:1}
-}
-</style>
-</head>
-<body>
-<header>
-  <div class="container topbar">
-    <a href="#home" class="brand"><span class="brand-icon">P</span> Payworld</a>
-    <nav id="nav">
-      <a href="#wallet">Wallet</a>
-      <a href="#marketplace">Marketplace</a>
-      <a href="#learn">Learn</a>
-      <a href="#rewards">Rewards</a>
-      <a href="#assistant">AI Assistant</a>
-      <a href="#account">Account</a>
-    </nav>
-    <div class="row" style="justify-content:flex-end">
-      <button class="btn secondary menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
-      <button class="btn" id="accountBtn">Sign in</button>
-    </div>
-  </div>
-</header>
+async function openAccountModal() {
+  const { data: { session } } =
+    await payworldSupabase.auth.getSession();
 
-<main class="container">
-  <section class="hero" id="home">
-    <div>
-      <span class="eyebrow"><span class="dot"></span> Your digital world</span>
-      <h1>Discover more.<br><span class="gradient-text">Do more with Payworld.</span></h1>
-      <p>Explore digital products, build practical skills, complete challenges, and discover useful tools—all in one modern platform.</p>
-      <div class="hero-actions">
-        <a href="#marketplace" class="btn">Explore marketplace ↗</a>
-        <a href="#learn" class="btn secondary">Start learning</a>
-      </div>
-      <div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-top:22px;gap:9px">
-        <span class="pill">✦ Digital tools</span>
-        <span class="pill">⌘ Learn skills</span>
-        <span class="pill">◇ Rewards</span>
-      </div>
-    </div>
-    <div class="hero-art">
-      <div class="orb"><div class="orb-inner">
-        <div><div class="orb-symbol">P</div><div class="orb-label">PAYWORLD</div></div>
-      </div></div>
-    </div>
-  </section>
+  if (session) {
+    const email = session.user.email || "Signed-in user";
 
-  <div class="notice">
-    <strong>DEMO MODE:</strong> This website currently uses fictional demo funds and simulated actions. No real deposits, withdrawals, cash rewards, or payments are processed. Demo balances have no cash value.
-  </div>
+    showModal(
+      "Your Payworld account",
+      `<p>Signed in as <strong>${escapeHtml(email)}</strong></p>
+       <p class="small muted">Your email account is authenticated by Supabase.</p>`,
+      "Log out",
+      async () => {
+        const { error } = await payworldSupabase.auth.signOut();
 
-  <section class="section" id="wallet">
-    <div class="section-head">
-      <div><h2>Your wallet</h2><p>Preview your balance and recent activity.</p></div>
-      <span class="tag">DEMO WALLET</span>
-    </div>
-    <div class="grid">
-      <div class="card wallet" style="grid-column:span 2">
-        <div class="row">
-          <span class="small">Available demo balance</span>
-          <span class="pill">◉ Simulated</span>
-        </div>
-        <div class="amount" id="balance">$1,000.00</div>
-        <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
-          <label for="currency" style="margin:0;color:#fff">Display currency</label>
-          <select id="currency" class="field" style="width:auto;min-width:100px;background:#ffffff15">
-            <option value="USD">USD $</option>
-            <option value="NGN">NGN ₦</option>
-            <option value="GBP">GBP £</option>
-            <option value="EUR">EUR €</option>
-            <option value="GHS">GHS ₵</option>
-            <option value="CAD">CAD $</option>
-          </select>
-        </div>
-        <div class="wallet-actions">
-          <button class="btn" id="demoCredit">＋ Add demo funds</button>
-          <button class="btn" id="demoSpend">↗ Simulate spending</button>
-        </div>
-        <p class="small" style="color:#eee8ff;margin:13px 0 0">Currency values are illustrative display conversions, not live exchange rates.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">↗</div><p class="muted">Demo spending</p>
-        <div class="stat-number" id="spent">$0.00</div>
-        <p class="small">Simulated purchases in this browser.</p>
-      </div>
-    </div>
-  </section>
+        if (error) {
+          toast("Logout failed. Please try again.");
+          return;
+        }
 
-  <section class="section" id="marketplace">
-    <div class="section-head">
-      <div><h2>Digital marketplace</h2><p>Sample products for exploring the shopping experience.</p></div>
-      <span class="tag">DEMO CATALOG</span>
-    </div>
-    <div class="grid" id="products"></div>
-  </section>
-
-  <section class="section" id="learn">
-    <div class="section-head">
-      <div><h2>Learning center</h2><p>Build skills one small lesson at a time.</p></div>
-    </div>
-    <div class="grid" id="courses"></div>
-  </section>
-
-  <section class="section" id="rewards">
-    <div class="section-head">
-      <div><h2>Daily challenges</h2><p>Earn demo points for trying platform features.</p></div>
-      <span class="tag">POINTS HAVE NO CASH VALUE</span>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">☀️</div><h3>Daily check-in</h3>
-        <p>Visit the demo platform and collect today's practice points.</p>
-        <div class="row"><span class="status">+10 demo points</span><button class="btn" id="checkin">Collect</button></div>
-      </div>
-      <div class="card">
-        <div class="card-icon">📚</div><h3>Explore a lesson</h3>
-        <p>Open a learning card and mark a lesson as completed.</p>
-        <div class="row"><span class="status">+15 demo points</span><button class="btn secondary" onclick="document.querySelector('#learn').scrollIntoView()">Explore</button></div>
-      </div>
-      <div class="card">
-        <div class="card-icon">🏆</div><h3>Your demo points</h3>
-        <p>Track the points you collect in this browser.</p>
-        <div class="stat-number"><span id="points">0</span> pts</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="referrals">
-    <div class="section-head"><div><h2>Invite your friends</h2><p>Share Payworld with people who may find it useful.</p></div></div>
-    <div class="card">
-      <div class="row" style="flex-wrap:wrap">
-        <div style="flex:1;min-width:200px">
-          <h3 style="margin-top:0">Grow your community 🌍</h3>
-          <p>Copy your sample referral message and share it. Referral tracking and rewards require a real backend and published program terms.</p>
-        </div>
-        <button class="btn" id="copyReferral">Copy invite message</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="assistant">
-    <div class="section-head"><div><h2>Payworld AI Assistant</h2><p>A simple built-in helper for exploring this demo.</p></div><span class="tag">LOCAL DEMO</span></div>
-    <div class="card">
-      <div class="row"><h3 style="margin:0">✦ How can I help?</h3><span class="small muted">Demo responses</span></div>
-      <div class="chat-box" id="chatBox" aria-live="polite">
-        <div class="bubble">Hello! 👋 I'm the Payworld demo assistant. Ask about the wallet, products, learning center, rewards, or account setup.</div>
-      </div>
-      <form id="chatForm" class="chat-controls">
-        <input class="field" id="chatInput" maxlength="500" placeholder="Ask Payworld something..." autocomplete="off" required>
-        <button class="btn" type="submit">Send</button>
-      </form>
-      <p class="small muted">This is a rule-based demo, not a connected AI service. Live AI requires a secure server integration.</p>
-    </div>
-  </section>
-
-  <section class="section" id="activity">
-    <div class="section-head"><div><h2>Recent activity</h2><p>Actions recorded locally in this demo.</p></div><button class="btn secondary" id="clearActivity">Clear</button></div>
-    <div class="card activity" id="activityList"><div class="empty">No activity yet.</div></div>
-  </section>
-
-  <section class="section" id="account">
-    <div class="section-head"><div><h2>Account & settings</h2><p>Try the demo account interface.</p></div></div>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">👤</div><h3>Demo account</h3>
-        <p id="accountStatus">You are browsing as a guest.</p>
-        <button class="btn full" id="accountAction">Create demo profile</button>
-        <p class="small">No real account is created. Sign-in and Google authentication are not connected yet.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🔐</div><h3>Security first</h3>
-        <p>Real accounts need secure authentication, server-side authorization, protected secrets, and proper data storage.</p>
-        <span class="tag">Backend integration required</span>
-      </div>
-      <div class="card">
-        <div class="card-icon">🌐</div><h3>Global access</h3>
-        <p>Select a display currency from the wallet. Regional pricing, tax rules, and live conversion rates need verified data sources.</p>
-        <span class="tag">Display currency selector</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="admin">
-    <div class="section-head"><div><h2>Admin preview</h2><p>Local statistics for this demo only.</p></div><span class="tag">NOT SECURE ADMIN ACCESS</span></div>
-    <div class="grid">
-      <div class="card"><p>Demo purchases</p><div class="stat-number" id="adminPurchases">0</div></div>
-      <div class="card"><p>Demo points issued</p><div class="stat-number" id="adminPoints">0</div></div>
-      <div class="card"><p>Demo spending</p><div class="stat-number" id="adminSpent">$0.00</div></div>
-    </div>
-    <p class="small muted">This preview is visible to everyone. Do not put private customer data, payment keys, or real admin controls in this file.</p>
-  </section>
-</main>
-
-<footer>
-  <div class="container">
-    <div class="row">
-      <a href="#home" class="brand"><span class="brand-icon">P</span> Payworld</a>
-      <span>Explore. Learn. Create.</span>
-      <span>© <span id="year"></span> Payworld Demo</span>
-    </div>
-    <p>This is a prototype. Demo balances, points, purchases, and activity are fictional and have no monetary value. No real payments are processed.</p>
-    <div class="row" style="justify-content:flex-start;gap:18px">
-      <a href="#account">Account</a><a href="#wallet">Wallet</a><a href="#assistant">Help</a>
-    </div>
-  </div>
-</footer>
-
-<div id="modalRoot"></div>
-<div id="toastRoot"></div>
-
-<script>
-"use strict";
-
-/* PAYWORLD FRONTEND DEMO
-   Browser state is not secure and is not a real account or wallet.
-*/
-const $ = (id) => document.getElementById(id);
-
-const currencyInfo = {
-  USD:{symbol:"$",rate:1},
-  NGN:{symbol:"₦",rate:1500},
-  GBP:{symbol:"£",rate:0.79},
-  EUR:{symbol:"€",rate:0.92},
-  GHS:{symbol:"₵",rate:15},
-  CAD:{symbol:"CA$",rate:1.36}
-};
-
-const products = [
-  {id:"creator",icon:"🎨",name:"Creator Starter Kit",description:"A sample collection of content planning ideas and creator resources.",price:12,category:"CREATOR TOOLS"},
-  {id:"web",icon:"💻",name:"Web Design Starter",description:"An introductory sample pack for learning website design fundamentals.",price:20,category:"TECHNOLOGY"},
-  {id:"business",icon:"📈",name:"Small Business Planner",description:"A sample planning resource for organizing a small business.",price:8,category:"PRODUCTIVITY"},
-  {id:"career",icon:"🧭",name:"Career Prep Pack",description:"Practice interview questions and a job-search checklist.",price:10,category:"CAREERS"},
-  {id:"design",icon:"✨",name:"Design Inspiration Pack",description:"A sample guide to colors, layout, and visual design principles.",price:15,category:"DESIGN"},
-  {id:"skills",icon:"🚀",name:"Digital Skills Bundle",description:"A sample roadmap for exploring useful digital skills.",price:25,category:"LEARNING"}
-];
-
-const courses = [
-  {id:"html",icon:"🌐",name:"HTML Fundamentals",description:"Learn how web pages are structured.",lessons:8},
-  {id:"css",icon:"🎨",name:"CSS & Responsive Design",description:"Explore layouts, colors, spacing, and mobile-friendly design.",lessons:10},
-  {id:"business",icon:"💡",name:"Digital Business Basics",description:"Understand online products, customers, and business models.",lessons:6}
-];
-
-let state = {
-  balance:1000,
-  spent:0,
-  points:0,
-  purchases:0,
-  transactions:[],
-  completed:[],
-  checkedIn:false,
-  profile:null
-};
-
-function money(amount){
-  const code=$("currency").value;
-  const info=currencyInfo[code];
-  const converted=amount*info.rate;
-  return info.symbol+converted.toLocaleString("en-US",{
-    minimumFractionDigits:2,maximumFractionDigits:2
-  });
-}
-function toast(message){
-  const root=$("toastRoot");
-  root.innerHTML="";
-  const node=document.createElement("div");
-  node.className="toast";
-  node.textContent=message;
-  root.appendChild(node);
-  setTimeout(()=>{if(node.parentNode)node.remove()},2800);
-}
-function record(label,amount,type){
-  state.transactions.unshift({label,amount,type,date:new Date().toLocaleString()});
-  state.transactions=state.transactions.slice(0,30);
-  render();
-}
-function render(){
-  $("balance").textContent=money(state.balance);
-  $("spent").textContent=money(state.spent);
-  $("points").textContent=state.points;
-  $("adminPurchases").textContent=state.purchases;
-  $("adminPoints").textContent=state.points;
-  $("adminSpent").textContent=money(state.spent);
-  $("year").textContent=new Date().getFullYear();
-
-  const list=$("activityList");
-  list.innerHTML="";
-  if(!state.transactions.length){
-    const empty=document.createElement("div");
-    empty.className="empty";
-    empty.textContent="No activity yet. Try a demo purchase or reward.";
-    list.appendChild(empty);
-  }else{
-    state.transactions.forEach(tx=>{
-      const row=document.createElement("div");
-      row.className="activity-item";
-      const left=document.createElement("div");
-      left.className="activity-left";
-      const icon=document.createElement("div");
-      icon.className="activity-icon";
-      icon.textContent=tx.type==="credit"?"＋":tx.type==="points"?"★":"↗";
-      const details=document.createElement("div");
-      const name=document.createElement("div");
-      name.textContent=tx.label;
-      const date=document.createElement("div");
-      date.className="small muted";
-      date.textContent=tx.date;
-      details.append(name,date);
-      left.append(icon,details);
-      const value=document.createElement("strong");
-      value.textContent=tx.type==="points"?"+"+tx.amount+" pts":money(tx.amount);
-      if(tx.type==="spend")value.style.color="#fda4af";
-      if(tx.type==="credit"||tx.type==="points")value.style.color="#4ade80";
-      row.append(left,value);
-      list.appendChild(row);
-    });
-  }
-  $("accountStatus").textContent=state.profile
-    ?"Demo profile: "+state.profile+" (not a verified account)"
-    :"You are browsing as a guest.";
-  $("accountAction").textContent=state.profile?"Edit demo profile":"Create demo profile";
-}
-
-function renderProducts(){
-  const root=$("products");
-  root.innerHTML="";
-  products.forEach(p=>{
-    const card=document.createElement("article");
-    card.className="card";
-    const icon=document.createElement("div");
-    icon.className="card-icon";icon.textContent=p.icon;
-    const tag=document.createElement("span");
-    tag.className="tag";tag.textContent=p.category;
-    const title=document.createElement("h3");title.textContent=p.name;
-    const desc=document.createElement("p");desc.textContent=p.description;
-    const price=document.createElement("div");price.className="product-price";
-    price.textContent=money(p.price);
-    const note=document.createElement("p");note.className="small";
-    note.textContent="Sample listing · Demo purchase only";
-    const btn=document.createElement("button");
-    btn.className="btn full";btn.textContent="Try demo purchase";
-    btn.addEventListener("click",()=>purchase(p));
-    card.append(icon,tag,title,desc,price,note,btn);
-    root.appendChild(card);
-  });
-}
-
-function renderCourses(){
-  const root=$("courses");root.innerHTML="";
-  courses.forEach(course=>{
-    const done=state.completed.includes(course.id);
-    const card=document.createElement("article");card.className="card";
-    const icon=document.createElement("div");icon.className="card-icon";icon.textContent=course.icon;
-    const title=document.createElement("h3");title.textContent=course.name;
-    const desc=document.createElement("p");desc.textContent=course.description;
-    const label=document.createElement("div");label.className="row";
-    const lessons=document.createElement("span");lessons.className="small muted";lessons.textContent=course.lessons+" sample lessons";
-    const status=document.createElement("span");status.className="tag";status.textContent=done?"COMPLETED":"FREE DEMO";
-    label.append(lessons,status);
-    const progress=document.createElement("div");progress.className="progress";
-    const bar=document.createElement("span");bar.style.width=done?"100%":"0%";progress.appendChild(bar);
-    const btn=document.createElement("button");btn.className="btn full";
-    btn.textContent=done?"Completed ✓":"Complete sample lesson";
-    btn.disabled=done;
-    btn.addEventListener("click",()=>{
-      if(done)return;
-      state.completed.push(course.id);
-      state.points+=15;
-      record("Completed: "+course.name,15,"points");
-      renderCourses();
-      toast("Lesson completed! +15 demo points.");
-    });
-    card.append(icon,title,desc,label,progress,btn);
-    root.appendChild(card);
-  });
-}
-
-function purchase(product){
-  if(state.balance<product.price){
-    toast("Your demo balance is too low. Add demo funds to continue.");
+        toast("You have logged out.");
+        updatePayworldAccount();
+      }
+    );
     return;
   }
-  showModal(
-    "Confirm demo purchase",
-    `<p>Try purchasing <strong>${escapeHtml(product.name)}</strong> for <strong>${escapeHtml(money(product.price))}</strong> in demo funds?</p><p class="small muted">No real payment will be taken and no real product will be delivered.</p>`,
-    "Confirm demo purchase",
-    ()=>{
-      state.balance-=product.price;
-      state.spent+=product.price;
-      state.purchases++;
-      record("Demo purchase: "+product.name,product.price,"spend");
-      toast("Demo purchase recorded. No real payment was made.");
-    }
-  );
-}
 
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g,ch=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[ch]);
-}
+  const root = $("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h2 id="authTitle">Sign in to Payworld</h2>
+        <p class="small muted">
+          Use your email to sign in or create an account.
+        </p>
 
-function showModal(title,content,confirmText,onConfirm){
-  const root=$("modalRoot");root.innerHTML="";
-  const backdrop=document.createElement("div");
-  backdrop.className="modal-backdrop";
-  const modal=document.createElement("div");
-  modal.className="modal";
-  const heading=document.createElement("h2");heading.textContent=title;
-  const body=document.createElement("div");body.innerHTML=content;
-  const actions=document.createElement("div");
-  actions.className="row";actions.style.marginTop="22px";
-  const cancel=document.createElement("button");cancel.className="btn secondary";cancel.textContent="Cancel";
-  const confirm=document.createElement("button");confirm.className="btn";confirm.textContent=confirmText;
-  cancel.onclick=()=>root.innerHTML="";
-  confirm.onclick=()=>{root.innerHTML="";onConfirm();};
-  actions.append(cancel,confirm);modal.append(heading,body,actions);backdrop.appendChild(modal);
-  backdrop.addEventListener("click",e=>{if(e.target===backdrop)root.innerHTML=""});
-  root.appendChild(backdrop);
-}
+        <form id="payworldAuthForm">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" class="field"
+            type="email" autocomplete="email" required>
 
-$("currency").addEventListener("change",()=>{
-  render();renderProducts();
-  toast("Display currency changed. Rates are illustrative.");
-});
+          <label for="authPassword" style="margin-top:14px">
+            Password
+          </label>
+          <input id="authPassword" class="field"
+            type="password" minlength="8"
+            autocomplete="current-password" required>
 
-$("demoCredit").addEventListener("click",()=>{
-  showModal("Add demo funds",
-    '<p>Choose a simulated amount to add to your demo wallet. This is not a deposit.</p><label for="creditAmount">Demo amount in USD</label><input id="creditAmount" class="field" type="number" min="1" max="10000" value="100">',
-    "Add demo funds",()=>{
-      const input=$("creditAmount");
-      const amount=Number(input&&input.value);
-      if(!Number.isFinite(amount)||amount<1||amount>10000){
-        toast("Enter a demo amount between 1 and 10,000.");
-        return;
+          <p id="authMessage" class="small muted"
+            aria-live="polite"></p>
+
+          <button class="btn full" type="submit" id="authSubmit">
+            Sign in
+          </button>
+        </form>
+
+        <button class="btn secondary full" id="authToggle"
+          style="margin-top:12px">
+          Need an account? Sign up
+        </button>
+
+        <button class="btn secondary full" id="authCancel"
+          style="margin-top:8px">
+          Cancel
+        </button>
+      </div>
+    </div>`;
+
+  let mode = "login";
+
+  $("authCancel").onclick = () => {
+    root.innerHTML = "";
+  };
+
+  $("authToggle").onclick = () => {
+    mode = mode === "login" ? "signup" : "login";
+    $("authTitle").textContent =
+      mode === "login" ? "Sign in to Payworld" : "Create your account";
+    $("authSubmit").textContent =
+      mode === "login" ? "Sign in" : "Create account";
+    $("authToggle").textContent =
+      mode === "login"
+        ? "Need an account? Sign up"
+        : "Already registered? Sign in";
+    $("authPassword").autocomplete =
+      mode === "login" ? "current-password" : "new-password";
+    $("authMessage").textContent = "";
+  };
+
+  $("payworldAuthForm").onsubmit = async (event) => {
+    event.preventDefault();
+
+    const email = $("authEmail").value.trim();
+    const password = $("authPassword").value;
+    const submit = $("authSubmit");
+    const message = $("authMessage");
+
+    submit.disabled = true;
+    message.textContent = "Please wait…";
+
+    try {
+      if (mode === "signup") {
+        const { data, error } =
+          await payworldSupabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: location.origin + location.pathname
+            }
+          });
+
+        if (error) throw error;
+
+        if (data.session) {
+          root.innerHTML = "";
+          toast("Your Payworld account has been created.");
+          updatePayworldAccount();
+        } else {
+          message.textContent =
+            "Registration submitted. Check your email to confirm your account.";
+          submit.disabled = false;
+        }
+      } else {
+        const { error } =
+          await payworldSupabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) throw error;
+
+        root.innerHTML = "";
+        toast("Welcome back to Payworld!");
+        updatePayworldAccount();
       }
-      state.balance+=amount;
-      record("Added demo funds",amount,"credit");
-      toast("Demo balance updated. No money was deposited.");
-    });
-});
-
-$("demoSpend").addEventListener("click",()=>{
-  const amount=5;
-  if(state.balance<amount){toast("Not enough demo funds.");return;}
-  state.balance-=amount;state.spent+=amount;
-  record("Sample demo transaction",amount,"spend");
-  toast("Sample spending recorded. No payment was made.");
-});
-
-$("checkin").addEventListener("click",()=>{
-  if(state.checkedIn){toast("You've already collected today's demo points in this session.");return;}
-  state.checkedIn=true;state.points+=10;
-  record("Daily demo check-in",10,"points");
-  $("checkin").textContent="Collected ✓";
-  $("checkin").disabled=true;
-  toast("+10 demo points. These points have no cash value.");
-});
-
-$("clearActivity").addEventListener("click",()=>{
-  state.transactions=[];
-  render();
-  toast("Local demo activity cleared.");
-});
-
-$("copyReferral").addEventListener("click",()=>{
-  const message="Join me on Payworld to explore digital tools, learning resources and products: "+location.href;
-  if(navigator.clipboard&&window.isSecureContext){
-    navigator.clipboard.writeText(message).then(()=>toast("Invite message copied!")).catch(()=>showReferral(message));
-  }else showReferral(message);
-});
-function showReferral(message){
-  showModal("Your invite message",
-    '<textarea id="referralText" class="field" rows="4">'+escapeHtml(message)+'</textarea><p class="small muted">Copy this message manually.</p>',
-    "Done",()=>{});
+    } catch (error) {
+      message.textContent = error.message || "Authentication failed.";
+      submit.disabled = false;
+    }
+  };
 }
 
-function addBubble(text,type){
-  const box=$("chatBox");
-  const bubble=document.createElement("div");
-  bubble.className="bubble"+(type==="user"?" user":"");
-  bubble.textContent=text;
-  box.appendChild(bubble);box.scrollTop=box.scrollHeight;
+async function updatePayworldAccount() {
+  const { data: { session } } =
+    await payworldSupabase.auth.getSession();
+
+  const email = session?.user?.email;
+
+  $("accountBtn").textContent = email ? "My account" : "Sign in";
+  $("accountStatus").textContent = email
+    ? "Signed in as " + email
+    : "You are browsing as a guest.";
+  $("accountAction").textContent =
+    email ? "Manage account" : "Sign in or create account";
 }
-function assistantReply(message){
-  const q=message.toLowerCase();
-  if(/wallet|balance|deposit|withdraw|money|payment/.test(q))
-    return "The current wallet is a demo. Its balance and transactions are fictional. Real deposits and withdrawals are not enabled. A secure payment backend and verified provider integration would be required.";
-  if(/product|market|buy|purchase|shop/.test(q))
-    return "Visit the marketplace to explore sample digital products. The purchase buttons only simulate a purchase and do not charge money or deliver real products.";
-  if(/learn|course|lesson|skill|certificate/.test(q))
-    return "Open the Learning Center and complete a sample lesson to earn 15 demo points. Real course content and certificates can be added as the project grows.";
-  if(/reward|point|challenge|daily/.test(q))
-    return "You can collect 10 demo points from the daily check-in and 15 points for a sample lesson. Demo points have no cash value.";
-  if(/referral|invite|friend/.test(q))
-    return "Use the referral section to copy an invite message. Actual referral tracking and rewards need a secure backend and clear program rules.";
-  if(/account|login|sign|google|register|password/.test(q))
-    return "The account interface is only a prototype. Email/password sign-in and Google sign-in must be connected to a proper authentication provider before real users register.";
-  if(/admin|owner|dashboard/.test(q))
-    return "The admin preview shows local demo statistics only. It is not protected. A real admin dashboard needs server-verified permissions and must never trust browser-only controls.";
-  if(/currency|exchange|rate|naira|dollar/.test(q))
-    return "You can change the display currency in the wallet. The example rates are fixed illustrations, not live exchange rates.";
-  if(/hello|hi |hey|good morning|good evening/.test(q))
-    return "Hello! 👋 Welcome to Payworld. I can explain the demo wallet, marketplace, learning center, rewards, referrals, and account setup.";
-  return "I'm the Payworld local demo assistant. Ask me about the wallet, products, learning center, rewards, referrals, currency, or account security. A connected AI service can be added later through a secure server.";
-}
-$("chatForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const input=$("chatInput");
-  const message=input.value.trim();
-  if(!message)return;
-  addBubble(message,"user");input.value="";
-  addBubble(assistantReply(message),"assistant");
+
+$("accountBtn").addEventListener("click", openAccountModal);
+$("accountAction").addEventListener("click", openAccountModal);
+
+payworldSupabase.auth.onAuthStateChange(() => {
+  updatePayworldAccount();
 });
-
-function openAccountModal(){
-  showModal("Create demo profile",
-    '<p>This only creates a temporary display name in this browser. It does not register an account.</p><label for="demoName">Display name</label><input id="demoName" class="field" maxlength="40" placeholder="Your display name" autocomplete="nickname">',
-    "Save demo profile",()=>{
-      const input=$("demoName");
-      const name=input?input.value.trim():"";
-      if(!name){toast("Enter a display name.");return;}
-      state.profile=name;
-      render();
-      toast("Demo profile updated. No account was created.");
-    });
-}
-$("accountBtn").addEventListener("click",openAccountModal);
-$("accountAction").addEventListener("click",openAccountModal);
-$("menuBtn").addEventListener("click",()=>$("nav").classList.toggle("open"));
-$("nav").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>$("nav").classList.remove("open")));
-
-render();
-renderProducts();
-renderCourses();
-</script>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const PAYWORLD_SUPABASE_URL =
-    "https://fkaunvoidromujlhoxow.supabase.co";
-
-  const PAYWORLD_SUPABASE_PUBLISHABLE_KEY =
-    "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
-
-  const payworldSupabase = window.supabase.createClient(
-    PAYWORLD_SUPABASE_URL,
-    PAYWORLD_SUPABASE_PUBLISHABLE_KEY
-  );
-
-  console.log("Payworld Supabase client initialized.");
-</script>
-
-</html>
