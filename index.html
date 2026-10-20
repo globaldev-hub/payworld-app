@@ -1,221 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101a35">
 
-async function openAccountModal() {
-  try {
-    const { data: { session }, error } =
-      await payworldSupabase.auth.getSession();
+  <title>Payworld — Your Account</title>
 
-    if (error) throw error;
+  <meta
+    name="description"
+    content="Manage your Payworld account securely."
+  >
 
-    if (session) {
-      const email = session.user.email || "Signed-in user";
-
-      showModal(
-        "Your Payworld account",
-        `<p>Signed in as <strong>${escapeHtml(email)}</strong></p>
-         <p class="small muted">
-           Your account is authenticated by Supabase.
-         </p>`,
-        "Log out",
-        async () => {
-          const { error: logoutError } =
-            await payworldSupabase.auth.signOut();
-
-          if (logoutError) {
-            toast("Logout failed. Please try again.");
-            return;
-          }
-
-          toast("You have logged out.");
-          await updatePayworldAccount();
-        }
-      );
-
-      return;
+  <style>
+    :root {
+      --navy: #101a35;
+      --blue: #4568ff;
+      --blue-dark: #304fe0;
+      --background: #f3f6fc;
+      --white: #ffffff;
+      --text: #18233d;
+      --muted: #72809a;
+      --border: #e3e8f2;
+      --green: #16865b;
+      --red: #c53939;
     }
 
-    const root = $("modalRoot");
+    * {
+      box-sizing: border-box;
+    }
 
-    root.innerHTML = `
-      <div class="modal-backdrop">
-        <div class="modal">
-          <h2 id="authTitle">Sign in to Payworld</h2>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-          <p class="small muted">
-            Sign in or create your Payworld account.
-          </p>
+    button,
+    input {
+      font: inherit;
+    }
 
-          <form id="payworldAuthForm">
-            <label for="authEmail">Email address</label>
-            <input
-              id="authEmail"
-              class="field"
-              type="email"
-              autocomplete="email"
-              required
-            >
+    button {
+      cursor: pointer;
+    }
 
-            <label for="authPassword" style="margin-top:14px">
-              Password
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .navbar {
+      background: var(--navy);
+      color: var(--white);
+      padding: 19px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -0.7px;
+    }
+
+    .brand span {
+      color: #8fa7ff;
+    }
+
+    .nav-status {
+      font-size: 12px;
+      color: #c8d3f0;
+    }
+
+    .container {
+      width: min(100% - 32px, 960px);
+      margin: 44px auto;
+    }
+
+    .hero {
+      margin-bottom: 25px;
+    }
+
+    .hero h1 {
+      font-size: clamp(27px, 5vw, 39px);
+      margin: 0 0 12px;
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 27px;
+      box-shadow: 0 8px 30px rgba(16, 26, 53, 0.045);
+    }
+
+    .card h2 {
+      font-size: 21px;
+      margin: 0 0 10px;
+    }
+
+    .description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 23px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 16px 0 8px;
+    }
+
+    .field {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d9e0ed;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(69, 104, 255, 0.12);
+    }
+
+    .btn {
+      border: 0;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin-top: 17px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      color: white;
+      background: var(--blue);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--blue-dark);
+    }
+
+    .btn-secondary {
+      background: #edf1ff;
+      color: #2948c5;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e0e7ff;
+    }
+
+    .btn-danger {
+      color: white;
+      background: #c53939;
+    }
+
+    .switch {
+      margin-top: 19px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .link-button {
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-weight: 700;
+      padding: 4px;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.6;
+      display: none;
+      overflow-wrap: anywhere;
+    }
+
+    .message.success {
+      display: block;
+      color: #126541;
+      background: #e7f8ef;
+    }
+
+    .message.error {
+      display: block;
+      color: #a32929;
+      background: #fff0f0;
+    }
+
+    .message.info {
+      display: block;
+      color: #2548a5;
+      background: #edf2ff;
+    }
+
+    .account-panel {
+      display: none;
+    }
+
+    .account-panel.visible {
+      display: block;
+    }
+
+    .account-icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: #e9edff;
+      display: grid;
+      place-items: center;
+      font-size: 29px;
+      margin-bottom: 20px;
+    }
+
+    .account-email {
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      margin: 14px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 7px 11px;
+      border-radius: 30px;
+      background: #e5f8ed;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .notice {
+      border: 1px solid var(--border);
+      background: #f9faff;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-top: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 25px 15px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 680px) {
+      .container {
+        margin: 30px auto;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="brand">Pay<span>world</span></div>
+    <div class="nav-status" id="connectionStatus">
+      Connecting securely…
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <h1>Your Payworld account</h1>
+      <p>
+        Sign in or create an account to manage your Payworld membership.
+      </p>
+    </section>
+
+    <div class="grid">
+
+      <section class="card" id="authCard">
+        <h2 id="formTitle">Welcome back</h2>
+
+        <p class="description" id="formDescription">
+          Sign in with your email address and password.
+        </p>
+
+        <form id="authForm">
+          <label class="field-label" for="email">
+            Email address
+          </label>
+
+          <input
+            class="field"
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            maxlength="254"
+            required
+          >
+
+          <label class="field-label" for="password">
+            Password
+          </label>
+
+          <input
+            class="field"
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            minlength="8"
+            required
+          >
+
+          <div id="confirmPasswordGroup" hidden>
+            <label class="field-label" for="confirmPassword">
+              Confirm password
             </label>
+
             <input
-              id="authPassword"
               class="field"
+              id="confirmPassword"
               type="password"
+              placeholder="Enter your password again"
+              autocomplete="new-password"
               minlength="8"
-              autocomplete="current-password"
-              required
             >
+          </div>
 
-            <p
-              id="authMessage"
-              class="small muted"
-              aria-live="polite"
-            ></p>
-
-            <button
-              class="btn full"
-              type="submit"
-              id="authSubmit"
-            >Sign in</button>
-          </form>
+          <div id="formMessage" class="message" role="status"
+               aria-live="polite"></div>
 
           <button
-            class="btn secondary full"
-            type="button"
-            id="authToggle"
-            style="margin-top:12px"
-          >Need an account? Sign up</button>
+            class="btn btn-primary"
+            id="submitButton"
+            type="submit"
+          >
+            Sign in
+          </button>
+        </form>
 
-          <button
-            class="btn secondary full"
-            type="button"
-            id="authCancel"
-            style="margin-top:8px"
-          >Cancel</button>
+        <div class="switch" id="switchControls">
+          <div>
+            Don't have an account?
+            <button class="link-button" id="switchMode" type="button">
+              Sign up
+            </button>
+          </div>
+
+          <div>
+            <button class="link-button" id="forgotPassword" type="button">
+              Forgot your password?
+            </button>
+          </div>
         </div>
-      </div>
-    `;
+      </section>
 
+      <section class="card account-panel" id="accountPanel">
+        <div class="account-icon">👤</div>
+
+        <h2>Account overview</h2>
+
+        <p class="description">
+          Your current Payworld sign-in status.
+        </p>
+
+        <span class="status-badge">Authenticated session</span>
+
+        <p class="description" style="margin-top:20px;margin-bottom:5px">
+          Signed in email address
+        </p>
+
+        <div class="account-email" id="accountEmail"></div>
+
+        <div id="accountMessage" class="message" role="status"
+             aria-live="polite"></div>
+
+        <button class="btn btn-secondary" id="refreshAccount" type="button">
+          Refresh account
+        </button>
+
+        <button class="btn btn-danger" id="logoutButton" type="button">
+          Log out
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>Account security</h2>
+
+        <p class="description">
+          Keep your account safe by protecting your password and email.
+        </p>
+
+        <div class="notice">
+          <strong>Secure authentication</strong><br>
+          Payworld uses Supabase Authentication to manage login sessions.
+          Email confirmation and password reset depend on your project
+          settings.
+        </div>
+
+        <div class="notice">
+          <strong>Important</strong><br>
+          Signing in does not create a payment balance, verify a payment,
+          or authorize a withdrawal. Financial transactions require a
+          separate, properly secured backend and payment verification.
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    Payworld · Account security matters.
+  </footer>
+
+  <!-- Supabase's public browser SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    "use strict";
+
+    /*
+      STEP 2:
+      Replace both placeholders with your existing Supabase project
+      URL and publishable key (or legacy anon key).
+
+      Never put a service_role key or secret key in browser code.
+    */
+
+    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+    const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+    const $ = (id) => document.getElementById(id);
+
+    const authCard = $("authCard");
+    const accountPanel = $("accountPanel");
+    const authForm = $("authForm");
+
+    let supabaseClient = null;
     let mode = "login";
+    let busy = false;
+    let authSubscription = null;
 
-    $("authCancel").onclick = () => {
-      root.innerHTML = "";
-    };
+    function showMessage(element, text, type = "info") {
+      element.textContent = text;
+      element.className = "message " + type;
+    }
 
-    $("authToggle").onclick = () => {
-      mode = mode === "login" ? "signup" : "login";
+    function clearMessage(element) {
+      element.textContent = "";
+      element.className = "message";
+    }
 
-      $("authTitle").textContent =
+    function setBusy(value) {
+      busy = value;
+
+      $("submitButton").disabled = value;
+      $("logoutButton").disabled = value;
+      $("refreshAccount").disabled = value;
+
+      if (value) {
+        $("submitButton").textContent = "Please wait…";
+      } else {
+        updateFormLabels();
+      }
+    }
+
+    function updateFormLabels() {
+      if (busy) return;
+
+      $("formTitle").textContent =
+        mode === "login" ? "Welcome back" :
+        mode === "signup" ? "Create your account" :
+        "Reset your password";
+
+      $("formDescription").textContent =
         mode === "login"
-          ? "Sign in to Payworld"
-          : "Create your account";
+          ? "Sign in with your email address and password."
+          : mode === "signup"
+          ? "Create your Payworld account using your email."
+          : "Enter your email to receive a password reset link.";
 
-      $("authSubmit").textContent =
-        mode === "login" ? "Sign in" : "Create account";
+      $("password").hidden = mode === "reset";
+      $("password").required = mode !== "reset";
 
-      $("authToggle").textContent =
-        mode === "login"
-          ? "Need an account? Sign up"
-          : "Already registered? Sign in";
+      $("confirmPasswordGroup").hidden = mode !== "signup";
+      $("confirmPassword").required = mode === "signup";
 
-      $("authPassword").autocomplete =
-        mode === "login"
-          ? "current-password"
-          : "new-password";
+      $("password").autocomplete =
+        mode === "signup" ? "new-password" : "current-password";
 
-      $("authMessage").textContent = "";
-    };
+      $("submitButton").textContent =
+        mode === "login" ? "Sign in" :
+        mode === "signup" ? "Create account" :
+        "Send reset link";
 
-    $("payworldAuthForm").onsubmit = async (event) => {
+      $("switchControls").hidden = mode === "reset";
+
+      $("switchMode").textContent =
+        mode === "login" ? "Sign up" : "Sign in";
+
+      $("forgotPassword").hidden = mode !== "login";
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+
+      clearMessage($("formMessage"));
+      $("password").value = "";
+      $("confirmPassword").value = "";
+
+      updateFormLabels();
+    }
+
+    function displaySession(session) {
+      const signedIn = Boolean(session?.user);
+
+      authCard.style.display = signedIn ? "none" : "block";
+      accountPanel.classList.toggle("visible", signedIn);
+
+      $("connectionStatus").textContent =
+        signedIn ? "Account signed in" : "Authentication ready";
+
+      if (signedIn) {
+        $("accountEmail").textContent =
+          session.user.email || "Email unavailable";
+      } else {
+        $("accountEmail").textContent = "";
+      }
+    }
+
+    async function initializePayworld() {
+      try {
+        if (!window.supabase?.createClient) {
+          throw new Error(
+            "The Supabase library could not load. Check your internet connection."
+          );
+        }
+
+        if (
+          SUPABASE_URL.includes("YOUR_SUPABASE") ||
+          SUPABASE_PUBLISHABLE_KEY.includes("YOUR_SUPABASE") ||
+          !SUPABASE_URL.startsWith("https://")
+        ) {
+          $("connectionStatus").textContent =
+            "Setup required";
+
+          showMessage(
+            $("formMessage"),
+            "Setup required: add your Supabase project URL and publishable key in index.html.",
+            "info"
+          );
+
+          $("submitButton").disabled = true;
+          $("forgotPassword").disabled = true;
+          $("switchMode").disabled = true;
+
+          return;
+        }
+
+        supabaseClient = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
+          }
+        );
+
+        /*
+          Register the listener before reading the initial session.
+          Keep the callback synchronous; do not run sign-in/sign-out
+          operations inside this callback.
+        */
+
+        const { data: listener } =
+          supabaseClient.auth.onAuthStateChange(
+            (_event, session) => {
+              displaySession(session);
+            }
+          );
+
+        authSubscription = listener.subscription;
+
+        const { data, error } =
+          await supabaseClient.auth.getSession();
+
+        if (error) throw error;
+
+        displaySession(data.session);
+
+      } catch (error) {
+        console.error("Payworld initialization error:", error);
+
+        $("connectionStatus").textContent =
+          "Connection problem";
+
+        showMessage(
+          $("formMessage"),
+          error.message || "Could not initialize authentication.",
+          "error"
+        );
+      }
+    }
+
+    authForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const email = $("authEmail").value.trim();
-      const password = $("authPassword").value;
-      const submit = $("authSubmit");
-      const message = $("authMessage");
+      if (!supabaseClient || busy) return;
 
-      submit.disabled = true;
-      message.textContent = "Please wait…";
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      const confirmPassword = $("confirmPassword").value;
+      const message = $("formMessage");
+
+      clearMessage(message);
+
+      if (mode === "signup" && password !== confirmPassword) {
+        showMessage(message, "Your passwords do not match.", "error");
+        return;
+      }
+
+      setBusy(true);
+      showMessage(message, "Please wait…", "info");
 
       try {
         if (mode === "signup") {
-          const { data, error: signupError } =
-            await payworldSupabase.auth.signUp({
+          const { data, error } =
+            await supabaseClient.auth.signUp({
               email,
               password,
               options: {
-                emailRedirectTo: window.location.href
+                emailRedirectTo: window.location.origin +
+                  window.location.pathname
               }
             });
 
-          if (signupError) throw signupError;
+          if (error) throw error;
 
           if (data.session) {
-            root.innerHTML = "";
-            toast("Your Payworld account has been created.");
-            await updatePayworldAccount();
+            showMessage(
+              message,
+              "Your account was created and you are signed in.",
+              "success"
+            );
           } else {
-            message.textContent =
-              "Registration submitted. Check your email to confirm your account.";
-            submit.disabled = false;
+            showMessage(
+              message,
+              "Registration submitted. Check your email for a confirmation link before signing in.",
+              "success"
+            );
           }
-        } else {
-          const { error: loginError } =
-            await payworldSupabase.auth.signInWithPassword({
+
+        } else if (mode === "login") {
+          const { error } =
+            await supabaseClient.auth.signInWithPassword({
               email,
               password
             });
 
-          if (loginError) throw loginError;
+          if (error) throw error;
 
-          root.innerHTML = "";
-          toast("Welcome back to Payworld!");
-          await updatePayworldAccount();
+          showMessage(message, "Sign-in successful.", "success");
+
+        } else if (mode === "reset") {
+          const { error } =
+            await supabaseClient.auth.resetPasswordForEmail(email, {
+              redirectTo: window.location.origin +
+                window.location.pathname
+            });
+
+          if (error) throw error;
+
+          showMessage(
+            message,
+            "If the address is registered, a password reset email will be sent. Check your inbox.",
+            "success"
+          );
         }
+
       } catch (error) {
-        message.textContent =
-          error.message || "Authentication failed. Please try again.";
+        console.error("Payworld authentication error:", error);
 
-        submit.disabled = false;
+        showMessage(
+          message,
+          error.message || "The request failed. Please try again.",
+          "error"
+        );
+
+      } finally {
+        setBusy(false);
       }
-    };
-  } catch (error) {
-    toast("Unable to open your account. Check your connection and try again.");
-    console.error("Payworld account error:", error);
-  }
-}
+    });
 
-function setPayworldAccount(session) {
-  const email = session?.user?.email;
+    $("switchMode").addEventListener("click", () => {
+      setMode(mode === "login" ? "signup" : "login");
+    });
 
-  $("accountBtn").textContent = email ? "My account" : "Sign in";
+    $("forgotPassword").addEventListener("click", () => {
+      setMode("reset");
+    });
 
-  $("accountStatus").textContent = email
-    ? "Signed in as " + email
-    : "You are browsing as a guest.";
+    $("logoutButton").addEventListener("click", async () => {
+      if (!supabaseClient || busy) return;
 
-  $("accountAction").textContent = email
-    ? "Manage account"
-    : "Sign in or create account";
-}
+      setBusy(true);
 
-async function updatePayworldAccount() {
-  const { data, error } =
-    await payworldSupabase.auth.getSession();
+      try {
+        const { error } = await supabaseClient.auth.signOut();
 
-  if (error) {
-    console.error("Could not retrieve account session:", error);
-    return;
-  }
+        if (error) throw error;
 
-  setPayworldAccount(data.session);
-}
+        displaySession(null);
+        setMode("login");
 
-$("accountBtn").addEventListener("click", openAccountModal);
-$("accountAction").addEventListener("click", openAccountModal);
+        showMessage(
+          $("formMessage"),
+          "You have successfully logged out.",
+          "success"
+        );
 
-payworldSupabase.auth.onAuthStateChange((_event, session) => {
-  setPayworldAccount(session);
-});
+      } catch (error) {
+        console.error("Payworld logout error:", error);
 
-updatePayworldAccount();
+        showMessage(
+          $("accountMessage"),
+          error.message || "Logout failed. Please try again.",
+          "error"
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    $("refreshAccount").addEventListener("click", async () => {
+      if (!supabaseClient || busy) return;
+
+      setBusy(true);
+
+      try {
+        const { data, error } =
+          await supabaseClient.auth.getSession();
+
+        if (error) throw error;
+
+        displaySession(data.session);
+
+        showMessage(
+          $("accountMessage"),
+          data.session
+            ? "Your account session is active."
+            : "No active session was found.",
+          data.session ? "success" : "info"
+        );
+
+      } catch (error) {
+        showMessage(
+          $("accountMessage"),
+          error.message || "Unable to refresh your account.",
+          "error"
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      authSubscription?.unsubscribe();
+    });
+
+    updateFormLabels();
+    initializePayworld();
+  </script>
+
+</body>
+</html>
