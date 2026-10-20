@@ -652,4 +652,20 @@ renderProducts();
 renderCourses();
 </script>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const PAYWORLD_SUPABASE_URL =
+    "https://fkaunvoidromujlhoxow.supabase.co";
+
+  const PAYWORLD_SUPABASE_PUBLISHABLE_KEY =
+    "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+  const payworldSupabase = window.supabase.createClient(
+    PAYWORLD_SUPABASE_URL,
+    PAYWORLD_SUPABASE_PUBLISHABLE_KEY
+  );
+
+  console.log("Payworld Supabase client initialized.");
+</script>
+
 </html>
